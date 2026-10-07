@@ -1,5 +1,5 @@
 name: openrouter-credits
-version: 1.0.0
+version: 1.1.0
 description: >-
   Track OpenRouter credit: current balance, spend windows (today / this week /
   this month / all time), API-key spend cap, burn rate and estimated runway.

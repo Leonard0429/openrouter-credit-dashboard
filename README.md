@@ -40,6 +40,29 @@ hermes plugins enable openrouter-credits
 hermes gateway restart        # a live gateway loads it in the next session
 ```
 
+## Desktop panel
+
+The package also ships a **live desktop panel** for the Hermes desktop app:
+
+- a **status-bar chip** showing the current balance at a glance, and
+- a **full panel page** (sidebar row + ⌘K command) with balance, a
+  spent-of-purchased meter, today / this week / this month / all-time spend,
+  burn rate, runway, the API-key cap, and a **Record snapshot** button.
+
+It refreshes itself every 60s via React Query, and `mod+alt+r` forces a refresh.
+
+The desktop half is **opt-in**, like the Python half: it inventories in
+**Settings → Plugins** but stays off until you toggle it on there.
+
+> **Your API key never reaches the UI.** The renderer holds no credential — the
+> panel calls this plugin's own backend route
+> (`/api/plugins/openrouter-credits/credits`), which runs inside the Hermes
+> process and reuses the exact same fetch code as the agent tool. The panel only
+> ever receives dollar amounts.
+
+Routes mount at gateway start, so after enabling the desktop half, restart the
+gateway once (`hermes gateway restart`) if the panel shows a backend error.
+
 ## Usage
 
 Just ask the agent — *"how much OpenRouter credit do I have left?"* — or call the
@@ -102,6 +125,13 @@ What this plugin does, so you can decide before installing:
   written to disk, or included in tool output.
 - **Local writes.** One file, `$HERMES_HOME/cache/openrouter-credits/history.jsonl`,
   holding timestamps and dollar amounts. No credentials.
+- **Desktop panel backend.** `dashboard/plugin_api.py` exposes two routes under
+  `/api/plugins/openrouter-credits/` (`GET /credits`, `POST /record`). They add
+  no new network targets — they run the same two OpenRouter GETs above in the
+  Hermes process and return dollar amounts to the UI. `GET /credits` is
+  read-only and never records a snapshot; only the agent tool and the panel's
+  explicit **Record snapshot** button append to the history file. Responses are
+  cached for 30s so a polling panel never amplifies upstream requests.
 - **No other reads.** It does not touch other tools' credential stores, browser
   profiles, or any path outside its own history file.
 - **Unattended-safe.** No prompts, no OAuth flow, no shell commands, no
