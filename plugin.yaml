@@ -1,0 +1,14 @@
+name: openrouter-credits
+version: 1.0.0
+description: >-
+  Track OpenRouter credit: current balance, spend windows (today / this week /
+  this month / all time), API-key spend cap, burn rate and estimated runway.
+  Snapshots are appended to a local history file so the tool can measure real
+  burn rate over time instead of guessing. Adds the openrouter_credits tool.
+author: Leonard0429
+kind: standalone
+requires_hermes: ">=0.21.5"
+provides_tools:
+  - openrouter_credits
+requires_env:
+  - OPENROUTER_API_KEY
